@@ -51,7 +51,10 @@
     (go
       (show! "Waiting for a click ...")
       (<! clicks)
-      (show! "Got a click!"))))
+      (show! "Got a click!")
+      (show! "Waiting for another click ...")
+      (<! clicks)
+      (show! "Done!"))))
 
 (ex2)
 
