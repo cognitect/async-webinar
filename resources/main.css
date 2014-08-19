@@ -1,0 +1,19 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: helvetica, arial, sans-serif;
+}
+
+.example {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+h2 {
+    margin-top: 0px;
+}
+
+.display {
+   font-family: courier, monospace;
+   font-size: 100px;
+}
