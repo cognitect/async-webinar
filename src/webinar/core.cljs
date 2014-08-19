@@ -24,17 +24,20 @@
 (defn mouse-loc->vec [e]
   [(.-clientX e) (.-clientY e)])
 
-(defn show! [id s]
-  (set! (.-innerHTML (.getElementById js/document id)) s))
+(defn show! [id msg]
+  (let [p (.createElement js/document "p")]
+    (set! (.-innerHTML p) msg)
+    (.appendChild (.getElementById js/document id) p)))
 
 ;; =============================================================================
 ;; Example 1
 
 (defn ex1 []
-  (let [clicks (events->chan (by-id "ex0-button") EventType.CLICK)
-        show! (partial show! "ex0-display")]
-    (show! "Waiting for a click ...")
-    (<! clicks)
-    (show! "Got a click!")))
+  (let [clicks (events->chan (by-id "ex1-button") EventType.CLICK)
+        show!  (partial show! "ex1-display")]
+    (go
+      (show! "Waiting for a click ...")
+      (<! clicks)
+      (show! "Got a click!"))))
 
 (ex1)

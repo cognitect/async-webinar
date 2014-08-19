@@ -5,12 +5,27 @@ body {
 }
 
 button {
+    outline: none;
+    color: #666;
     font-size: 16px;
-    border: 2px solid #333;
+    border: 2px solid #666;
     background-color: white;
     border-radius: 4px;
     padding: 4px 12px;
     text-transform: uppercase;
+}
+
+button:hover {
+    color: black;
+    border-color: black;
+}
+
+table td.left {
+    vertical-align: top;
+}
+
+button:active {
+    background-color: #efefef;
 }
 
 .example {
@@ -36,6 +51,7 @@ h2 {
 }
 
 .display {
+   padding: 10px;
    font-family: courier, monospace;
-   font-size: 100px;
+   font-size: 16px;
 }
