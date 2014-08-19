@@ -10,6 +10,9 @@
 ;; =============================================================================
 ;; Utilities
 
+(defn by-id [id]
+  (.getElementById js/document id))
+
 (defn events->chan
   ([el event-type] (events->chan el event-type nil))
   ([el event-type xform]
@@ -28,11 +31,10 @@
 ;; Example 1
 
 (defn ex1 []
-  (let [c (events->chan js/document EventType.MOUSEMOVE
-            (comp (map mouse-loc->vec)))]
-    (go (loop []
-          (let [v (<! c)]
-            (show! "ex1-display" (pr-str v))
-            (recur))))))
+  (let [clicks (events->chan (by-id "ex0-button") EventType.CLICK)
+        show! (partial show! "ex0-display")]
+    (show! "Waiting for a click ...")
+    (<! clicks)
+    (show! "Got a click!")))
 
 (ex1)

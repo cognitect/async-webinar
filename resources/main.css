@@ -4,9 +4,31 @@ body {
     font-family: helvetica, arial, sans-serif;
 }
 
+button {
+    font-size: 16px;
+    border: 2px solid #333;
+    background-color: white;
+    border-radius: 4px;
+    padding: 4px 12px;
+    text-transform: uppercase;
+}
+
 .example {
-    padding: 10px;
+    padding: 20px;
     border-bottom: 1px solid #333;
+}
+
+.example table {
+    width: 100%;
+}
+
+.example table td {
+    width: 50%;
+}
+
+.display {
+    background-color: #efefef;
+    min-height: 100px;
 }
 
 h2 {
