@@ -41,3 +41,17 @@
       (show! "Got a click!"))))
 
 (ex1)
+
+;; =============================================================================
+;; Example 2
+
+(defn ex2 []
+  (let [clicks (events->chan (by-id "ex2-button") EventType.CLICK)
+        show!  (partial show! "ex2-display")]
+    (go
+      (show! "Waiting for a click ...")
+      (<! clicks)
+      (show! "Got a click!"))))
+
+(ex2)
+
