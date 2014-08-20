@@ -178,3 +178,36 @@
             (recur (inc i))))))))
 
 (ex8)
+
+;; =============================================================================
+;; Example 9
+
+(defn show-card! [id card]
+  (set! (.-innerHTML (by-id id)) card))
+
+(defn ex9 []
+  (let [prev-button (by-id "ex9-button-prev")
+        next-button (by-id "ex9-button-next")
+        prev        (events->chan prev-button EventType.CLICK)
+        next        (events->chan next-button EventType.CLICK)
+        animals     [:aardvark :beetle :cat :dog :elk :ferret
+                     :goose :hippo :ibis :jellyfish :kangaroo]
+        max-idx     (dec (count animals))
+        show-card!  (partial show-card! "ex9-card")]
+    (go
+      (loop [idx 0]
+        (when (zero? idx)
+          (set! (.-className prev-button) "disabled"))
+        (when (== idx max-idx)
+          (set! (.-className next-button) "disabled"))
+        (show-card! (nth animals idx))
+        (let [[v c] (alts! [prev next])]
+          (condp =
+            prev (if (pos? idx)
+                   (recur (dec idx))
+                   (recur idx))
+            next (if (< idx max-idx)
+                   (recur (inc idx))
+                   (recur idx))))))))
+
+(ex9)
