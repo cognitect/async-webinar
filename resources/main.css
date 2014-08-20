@@ -1,5 +1,5 @@
 body {
-    margin: 0;
+    margin: 0 0 300px 0;
     padding: 0;
     font-family: helvetica, arial, sans-serif;
 }
@@ -51,4 +51,18 @@ h2 {
     font-family: courier, monospace;
     font-size: 16px;
     border: 1px solid #ccc;
+}
+
+.scrolling {
+    position: relative;
+    height: 220px;
+    max-height: 200px;
+    overflow-y: hidden;
+}
+
+.scrolling > div {
+    position: absolute;
+    bottom: -12px;
+    left: 0px;
+    right: 0px;
 }

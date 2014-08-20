@@ -135,3 +135,27 @@
 
 (ex6)
 
+;; =============================================================================
+;; Example 7
+
+(defn ex7 []
+  (let [button (by-id "ex7-button")
+        clicks (events->chan button EventType.CLICK)
+        mouse  (events->chan js/window EventType.MOUSEMOVE
+                 (comp (map mouse-loc->vec)
+                       (filter (fn [[x y]] (zero? (mod y 5))))))
+        show!  (partial show! "ex7-messages")]
+    (go
+      (show! "Click button to start tracking the mouse!")
+      (<! clicks)
+      (set! (.-innerHTML button) "Stop!")
+      (loop []
+        (let [[v c] (alts! [mouse clicks])]
+          (cond
+            (= c clicks) (show! "Done!")
+            :else
+            (do
+              (show! (pr-str v))
+              (recur))))))))
+
+(ex7)
