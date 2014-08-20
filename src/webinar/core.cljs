@@ -143,7 +143,7 @@
         clicks (events->chan button EventType.CLICK)
         mouse  (events->chan js/window EventType.MOUSEMOVE
                  (comp (map mouse-loc->vec)
-                       (filter (fn [[x y]] (zero? (mod y 5))))))
+                       (filter (fn [[_ y]] (zero? (mod y 5))))))
         show!  (partial show! "ex7-messages")]
     (go
       (show! "Click button to start tracking the mouse!")
@@ -159,3 +159,22 @@
               (recur))))))))
 
 (ex7)
+
+;; =============================================================================
+;; Example 8
+
+(defn ex8 []
+  (let [clicks (events->chan (by-id "ex8-button") EventType.CLICK)
+        show!  (partial show! "ex8-messages")]
+    (go
+      (show! "Click the button ten times!")
+      (<! clicks)
+      (loop [i 1]
+        (show! (str i " clicks!"))
+        (if (> i 9)
+          (show! "Done!")
+          (do
+            (<! clicks)
+            (recur (inc i))))))))
+
+(ex8)
