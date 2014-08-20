@@ -196,13 +196,15 @@
         show-card!  (partial show-card! "ex9-card")]
     (go
       (loop [idx 0]
-        (when (zero? idx)
-          (set! (.-className prev-button) "prev disabled"))
-        (when (== idx max-idx)
-          (set! (.-className next-button) "next disabled"))
+        (if (zero? idx)
+          (set! (.-className prev-button) "prev disabled")
+          (set! (.-className prev-button) "prev"))
+        (if (== idx max-idx)
+          (set! (.-className next-button) "next disabled")
+          (set! (.-className next-button) "next"))
         (show-card! (nth animals idx))
         (let [[v c] (alts! [prev next])]
-          (condp =
+          (condp = c
             prev (if (pos? idx)
                    (recur (dec idx))
                    (recur idx))
