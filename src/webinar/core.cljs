@@ -58,3 +58,38 @@
 
 (ex2)
 
+;; =============================================================================
+;; Example 3
+
+(defn ex3 []
+  (let [clicks-a (events->chan (by-id "ex3-button-a") EventType.CLICK)
+        clicks-b (events->chan (by-id "ex3-button-b") EventType.CLICK)
+        show!    (partial show! "ex3-messages")]
+    (go
+      (show! "Waiting for a click from Button A ...")
+      (<! clicks-a)
+      (show! "Got a click!")
+      (show! "Waiting for a click from Button B ...")
+      (<! clicks-b)
+      (show! "Done!"))))
+
+(ex3)
+
+;; =============================================================================
+;; Example 4
+
+(defn ex4 []
+  (let [clicks (events->chan (by-id "ex4-button-a") EventType.CLICK)
+        c0     (chan)
+        c1     (chan)
+        show!  (partial show! "ex4-messages")]
+    (go
+      (show! "Waiting for click.")
+      (<! clicks)
+      (show! "Putting a value on channel c0, cannot proceed until someone takes")
+      (>! c0 (js/Date.))
+      (show! "We'll never get this far!")
+      (<! c1))))
+
+(ex4)
+

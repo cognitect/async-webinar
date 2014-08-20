@@ -41,17 +41,14 @@ button:active {
     width: 50%;
 }
 
-.display {
-    background-color: #efefef;
-    min-height: 100px;
-}
-
 h2 {
     margin-top: 0px;
 }
 
 .display {
-   padding: 10px;
-   font-family: courier, monospace;
-   font-size: 16px;
+    background-color: #efefef;
+    padding: 10px;
+    font-family: courier, monospace;
+    font-size: 16px;
+    border: 1px solid #ccc;
 }
