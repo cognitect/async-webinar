@@ -81,7 +81,6 @@
 (defn ex4 []
   (let [clicks (events->chan (by-id "ex4-button-a") EventType.CLICK)
         c0     (chan)
-        c1     (chan)
         show!  (partial show! "ex4-messages")]
     (go
       (show! "Waiting for click.")
@@ -89,7 +88,28 @@
       (show! "Putting a value on channel c0, cannot proceed until someone takes")
       (>! c0 (js/Date.))
       (show! "We'll never get this far!")
-      (<! c1))))
+      (<! c0))))
 
 (ex4)
+
+;; =============================================================================
+;; Example 5
+
+(defn ex5 []
+  (let [clicks (events->chan (by-id "ex5-button-a") EventType.CLICK)
+        c0     (chan)
+        show!  (partial show! "ex5-messages")]
+    (go
+      (show! "Waiting for click.")
+      (<! clicks)
+      (show! "Putting a value on channel c0, cannot proceed until someone takes")
+      (>! c0 (js/Date.))
+      (show! "Someone took the value from c0!"))
+    (go
+      (let [v (<! c0)]
+        (show! (str "We got a value from c0: " v))))))
+
+(ex5)
+
+
 
