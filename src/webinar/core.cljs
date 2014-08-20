@@ -230,7 +230,7 @@
     (classes/remove next "disabled")))
 
 (defn ex10 []
-  (let [start-stop-button (by-id "ex-10-button-start-stop")
+  (let [start-stop-button (by-id "ex10-button-start-stop")
         prev-button (by-id "ex10-button-prev")
         next-button (by-id "ex10-button-next")
         start-stop  (events->chan start-stop-button EventType.CLICK)
@@ -255,7 +255,12 @@
           (show-card! (nth animals idx))
           (let [[v c] (alts! [actions start-stop])]
             (if (= c start-stop)
-              (events/removeAll js/window EventType.KEYPRESS)
+              (do
+                (events/removeAll js/window EventType.KEYPRESS)
+                (set! (.-innerHTML start-stop-button) "Done")
+                (doseq [button [start-stop-button prev-button next-button]]
+                  (classes/add button "disabled"))
+                (show-card! ""))
               (condp = v
                 :previous (if (pos? idx)
                             (recur (dec idx))
