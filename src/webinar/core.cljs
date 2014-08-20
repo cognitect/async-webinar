@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.core.async :as async
              :refer [>! <! put! take! chan timeout alts!]]
-            [goog.events :as events])
+            [goog.events :as events]
+            [goog.dom.classes :as classes])
   (:import [goog.events EventType]))
 
 (enable-console-print!)
@@ -197,11 +198,11 @@
     (go
       (loop [idx 0]
         (if (zero? idx)
-          (set! (.-className prev-button) "prev disabled")
-          (set! (.-className prev-button) "prev"))
+          (classes/add prev-button "disabled")
+          (classes/remove prev-button "disabled"))
         (if (== idx max-idx)
-          (set! (.-className next-button) "next disabled")
-          (set! (.-className next-button) "next"))
+          (classes/add next-button "disabled")
+          (classes/remove next-button "disabled"))
         (show-card! (nth animals idx))
         (let [[v c] (alts! [prev next])]
           (condp = c
@@ -213,3 +214,55 @@
                    (recur idx))))))))
 
 (ex9)
+
+;; =============================================================================
+;; Example 9
+
+(defn show-card! [id card]
+  (set! (.-innerHTML (by-id id)) card))
+
+(defn init-buttons [i max prev next]
+  (if (zero? i)
+    (classes/add prev "disabled")
+    (classes/remove prev "disabled"))
+  (if (== i max)
+    (classes/add next "disabled")
+    (classes/remove next "disabled")))
+
+(defn ex10 []
+  (let [start-stop-button (by-id "ex-10-button-start-stop")
+        prev-button (by-id "ex10-button-prev")
+        next-button (by-id "ex10-button-next")
+        start-stop  (events->chan start-stop-button EventType.CLICK)
+        prev        (events->chan prev-button EventType.CLICK
+                      (map (constantly :previous)))
+        next        (events->chan next-button EventType.CLICK
+                      (map (constantly :next)))
+        animals     [:aardvark :beetle :cat :dog :elk :ferret
+                     :goose :hippo :ibis :jellyfish :kangaroo]
+        max-idx     (dec (count animals))
+        show-card!  (partial show-card! "ex10-card")]
+    (go
+      (<! start-stop)
+      (let [keys    (events->chan js/window EventType.KEYPRESS
+                      (comp (map #(.-keyCode %))
+                            (filter #{37 39})
+                            (map {37 :previous 39 :next})))
+            actions (async/merge [prev next keys])]
+        (set! (.-innerHTML start-stop-button) "Stop!")
+        (loop [idx 0]
+          (init-buttons idx max-idx prev-button next-button)
+          (show-card! (nth animals idx))
+          (let [[v c] (alts! [actions start-stop])]
+            (if (= c start-stop)
+              (events/removeAll js/window EventType.KEYPRESS)
+              (condp = v
+                :previous (if (pos? idx)
+                            (recur (dec idx))
+                            (recur idx))
+                :next (if (< idx max-idx)
+                        (recur (inc idx))
+                        (recur idx))
+                (recur idx)))))))))
+
+(ex10)
