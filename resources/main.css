@@ -66,3 +66,7 @@ h2 {
     left: 0px;
     right: 0px;
 }
+
+button.disabled {
+    opacity: 0.5;
+}

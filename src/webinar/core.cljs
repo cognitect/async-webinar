@@ -197,9 +197,9 @@
     (go
       (loop [idx 0]
         (when (zero? idx)
-          (set! (.-className prev-button) "disabled"))
+          (set! (.-className prev-button) "prev disabled"))
         (when (== idx max-idx)
-          (set! (.-className next-button) "disabled"))
+          (set! (.-className next-button) "next disabled"))
         (show-card! (nth animals idx))
         (let [[v c] (alts! [prev next])]
           (condp =
