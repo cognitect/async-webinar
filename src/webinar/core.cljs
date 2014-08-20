@@ -221,7 +221,7 @@
 (defn show-card! [id card]
   (set! (.-innerHTML (by-id id)) card))
 
-(defn init-buttons [i max prev next]
+(defn style-buttons! [i max prev next]
   (if (zero? i)
     (classes/add prev "disabled")
     (classes/remove prev "disabled"))
@@ -229,7 +229,18 @@
     (classes/add next "disabled")
     (classes/remove next "disabled")))
 
-(defn ex10 []
+(defn disable-buttons! [[start-stop-button :as buttons]]
+  (set! (.-innerHTML start-stop-button) "Done")
+  (doseq [button buttons]
+    (classes/add button "disabled")))
+
+(defn keys-chan []
+  (events->chan js/window EventType.KEYDOWN
+    (comp (map #(.-keyCode %))
+          (filter #{37 39})
+          (map {37 :previous 39 :next}))))
+
+(defn ex10 [animals]
   (let [start-stop-button (by-id "ex10-button-start-stop")
         prev-button (by-id "ex10-button-prev")
         next-button (by-id "ex10-button-next")
@@ -238,30 +249,26 @@
                       (map (constantly :previous)))
         next        (events->chan next-button EventType.CLICK
                       (map (constantly :next)))
-        animals     [:aardvark :beetle :cat :dog :elk :ferret
-                     :goose :hippo :ibis :jellyfish :kangaroo]
         max-idx     (dec (count animals))
         show-card!  (partial show-card! "ex10-card")]
     (go
+      ;; wait to start
       (<! start-stop)
-      (let [keys    (events->chan js/window EventType.KEYDOWN
-                      (comp (map #(.-keyCode %))
-                            (filter #{37 39})
-                            (map {37 :previous 39 :next})))
+      ;; start listening to key events now
+      (let [keys    (keys-chan)
             actions (async/merge [prev next keys])]
         (set! (.-innerHTML start-stop-button) "Stop!")
         (loop [idx 0]
-          (init-buttons idx max-idx prev-button next-button)
+          (style-buttons! idx max-idx prev-button next-button)
           (show-card! (nth animals idx))
-          (let [[v c] (alts! [actions start-stop])]
+          ;; wait for next action
+          (let [[action c] (alts! [actions start-stop])]
             (if (= c start-stop)
               (do
                 (events/removeAll js/window EventType.KEYDOWN)
-                (set! (.-innerHTML start-stop-button) "Done")
-                (doseq [button [start-stop-button prev-button next-button]]
-                  (classes/add button "disabled"))
+                (disable-buttons! [start-stop-button prev-button next-button])
                 (show-card! ""))
-              (condp = v
+              (condp = action
                 :previous (if (pos? idx)
                             (recur (dec idx))
                             (recur idx))
@@ -270,4 +277,5 @@
                         (recur idx))
                 (recur idx)))))))))
 
-(ex10)
+(ex10 [:aardvark :beetle :cat :dog :elk :ferret
+       :goose :hippo :ibis :jellyfish :kangaroo])
