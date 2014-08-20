@@ -1,7 +1,7 @@
 (ns webinar.core
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :as async
-             :refer [>! <! put! take! chan timeout alts!]]
+             :refer [>! <! put! chan alts!]]
             [goog.events :as events]
             [goog.dom.classes :as classes])
   (:import [goog.events EventType]))
