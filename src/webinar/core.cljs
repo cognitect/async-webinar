@@ -244,7 +244,7 @@
         show-card!  (partial show-card! "ex10-card")]
     (go
       (<! start-stop)
-      (let [keys    (events->chan js/window EventType.KEYPRESS
+      (let [keys    (events->chan js/window EventType.KEYDOWN
                       (comp (map #(.-keyCode %))
                             (filter #{37 39})
                             (map {37 :previous 39 :next})))
@@ -256,7 +256,7 @@
           (let [[v c] (alts! [actions start-stop])]
             (if (= c start-stop)
               (do
-                (events/removeAll js/window EventType.KEYPRESS)
+                (events/removeAll js/window EventType.KEYDOWN)
                 (set! (.-innerHTML start-stop-button) "Done")
                 (doseq [button [start-stop-button prev-button next-button]]
                   (classes/add button "disabled"))

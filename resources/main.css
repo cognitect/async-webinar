@@ -20,12 +20,21 @@ button:hover {
     border-color: black;
 }
 
-table td.left {
-    vertical-align: top;
+button.disabled:hover {
+    color: #666;
+    border-color: #666;
 }
 
 button:active {
     background-color: #efefef;
+}
+
+button.disabled:active {
+    background-color: white;
+}
+
+table td.left {
+    vertical-align: top;
 }
 
 .example {
