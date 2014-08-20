@@ -216,7 +216,7 @@
 (ex9)
 
 ;; =============================================================================
-;; Example 9
+;; Example 10
 
 (defn show-card! [id card]
   (set! (.-innerHTML (by-id id)) card))
