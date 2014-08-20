@@ -34,7 +34,7 @@
 
 (defn ex1 []
   (let [clicks (events->chan (by-id "ex1-button") EventType.CLICK)
-        show!  (partial show! "ex1-display")]
+        show!  (partial show! "ex1-messages")]
     (go
       (show! "Waiting for a click ...")
       (<! clicks)
@@ -47,7 +47,7 @@
 
 (defn ex2 []
   (let [clicks (events->chan (by-id "ex2-button") EventType.CLICK)
-        show!  (partial show! "ex2-display")]
+        show!  (partial show! "ex2-messages")]
     (go
       (show! "Waiting for a click ...")
       (<! clicks)
