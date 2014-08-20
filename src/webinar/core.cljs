@@ -96,7 +96,7 @@
 ;; Example 5
 
 (defn ex5 []
-  (let [clicks (events->chan (by-id "ex5-button-a") EventType.CLICK)
+  (let [clicks (events->chan (by-id "ex5-button") EventType.CLICK)
         c0     (chan)
         show!  (partial show! "ex5-messages")]
     (go
@@ -111,5 +111,27 @@
 
 (ex5)
 
+;; =============================================================================
+;; Example 6
 
+(defn ex6 []
+  (let [button (by-id "ex6-button")
+        clicks (events->chan button EventType.CLICK)
+        mouse  (events->chan js/window EventType.MOUSEMOVE
+                 (map mouse-loc->vec))
+        show!  (partial show! "ex6-messages")]
+    (go
+      (show! "Click button to start tracking the mouse!")
+      (<! clicks)
+      (set! (.-innerHTML button) "Stop!")
+      (loop []
+        (let [[v c] (alts! [mouse clicks])]
+          (cond
+            (= c clicks) (show! "Done!")
+            :else
+            (do
+              (show! (pr-str v))
+              (recur))))))))
+
+(ex6)
 
