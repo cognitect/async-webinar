@@ -15,12 +15,11 @@
   (.getElementById js/document id))
 
 (defn events->chan
-  ([el event-type] (events->chan el event-type nil))
-  ([el event-type xform]
-   (let [c (chan 1 xform)]
-     (events/listen el event-type
-       (fn [e] (put! c e)))
-     c)))
+  ([el event-type] (events->chan el event-type (chan)))
+  ([el event-type c]
+   (events/listen el event-type
+     (fn [e] (put! c e)))
+   c))
 
 (defn mouse-loc->vec [e]
   [(.-clientX e) (.-clientY e)])
@@ -119,7 +118,7 @@
   (let [button (by-id "ex6-button")
         clicks (events->chan button EventType.CLICK)
         mouse  (events->chan js/window EventType.MOUSEMOVE
-                 (map mouse-loc->vec))
+                 (chan 1 (map mouse-loc->vec)))
         show!  (partial show! "ex6-messages")]
     (go
       (show! "Click button to start tracking the mouse!")
@@ -143,8 +142,8 @@
   (let [button (by-id "ex7-button")
         clicks (events->chan button EventType.CLICK)
         mouse  (events->chan js/window EventType.MOUSEMOVE
-                 (comp (map mouse-loc->vec)
-                       (filter (fn [[_ y]] (zero? (mod y 5))))))
+                 (chan 1 (comp (map mouse-loc->vec)
+                               (filter (fn [[_ y]] (zero? (mod y 5)))))))
         show!  (partial show! "ex7-messages")]
     (go
       (show! "Click button to start tracking the mouse!")
@@ -236,9 +235,9 @@
 
 (defn keys-chan []
   (events->chan js/window EventType.KEYDOWN
-    (comp (map #(.-keyCode %))
-          (filter #{37 39})
-          (map {37 :previous 39 :next}))))
+    (chan 1 (comp (map #(.-keyCode %))
+                  (filter #{37 39})
+                  (map {37 :previous 39 :next})))))
 
 (defn ex10 [animals]
   (let [start-stop-button (by-id "ex10-button-start-stop")
@@ -246,9 +245,9 @@
         next-button (by-id "ex10-button-next")
         start-stop  (events->chan start-stop-button EventType.CLICK)
         prev        (events->chan prev-button EventType.CLICK
-                      (map (constantly :previous)))
+                      (chan 1 (map (constantly :previous))))
         next        (events->chan next-button EventType.CLICK
-                      (map (constantly :next)))
+                      (chan 1 (map (constantly :next))))
         max-idx     (dec (count animals))
         show-card!  (partial show-card! "ex10-card")]
     (go
