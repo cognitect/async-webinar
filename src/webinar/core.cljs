@@ -11,23 +11,35 @@
 ;; =============================================================================
 ;; Utilities
 
-(defn by-id [id]
+(defn by-id
+  "Short-hand for document.getElementById(id)"
+  [id]
   (.getElementById js/document id))
 
 (defn events->chan
+  "Given a target DOM element and event type return a channel of
+  observed events. Can supply the channel to receive events as third
+  optional argument."
   ([el event-type] (events->chan el event-type (chan)))
   ([el event-type c]
    (events/listen el event-type
      (fn [e] (put! c e)))
    c))
 
-(defn mouse-loc->vec [e]
+(defn mouse-loc->vec
+  "Given a Google Closure normalized DOM mouse event return the
+  mouse x and y position as a two element vector."
+  [e]
   [(.-clientX e) (.-clientY e)])
 
-(defn show! [id msg]
-  (let [p (.createElement js/document "p")]
+(defn show!
+  "Given a CSS id and a message string append a child paragraph element
+  with the given message string."
+  [id msg]
+  (let [el (.getElementById js/document id)
+        p  (.createElement js/document "p")]
     (set! (.-innerHTML p) msg)
-    (.appendChild (.getElementById js/document id) p)))
+    (.appendChild el p)))
 
 ;; =============================================================================
 ;; Example 1
@@ -182,8 +194,11 @@
 ;; =============================================================================
 ;; Example 9
 
-(defn show-card! [id card]
-  (set! (.-innerHTML (by-id id)) card))
+(defn set-html!
+  "Given a CSS id, replace the matching DOM element's
+  content with the supplied string."
+  [id s]
+  (set! (.-innerHTML (by-id id)) s))
 
 (defn ex9 []
   (let [prev-button (by-id "ex9-button-prev")
@@ -193,7 +208,7 @@
         animals     [:aardvark :beetle :cat :dog :elk :ferret
                      :goose :hippo :ibis :jellyfish :kangaroo]
         max-idx     (dec (count animals))
-        show-card!  (partial show-card! "ex9-card")]
+        set-html!   (partial set-html! "ex9-card")]
     (go
       (loop [idx 0]
         (if (zero? idx)
@@ -202,7 +217,7 @@
         (if (== idx max-idx)
           (classes/add next-button "disabled")
           (classes/remove next-button "disabled"))
-        (show-card! (nth animals idx))
+        (set-html! (nth animals idx))
         (let [[v c] (alts! [prev next])]
           (condp = c
             prev (if (pos? idx)
@@ -217,10 +232,10 @@
 ;; =============================================================================
 ;; Example 10
 
-(defn show-card! [id card]
-  (set! (.-innerHTML (by-id id)) card))
-
-(defn style-buttons! [i max prev next]
+(defn style-buttons!
+  "Given a current index and an upper bound disable
+  or enable the given previous and next controls."
+  [i max prev next]
   (if (zero? i)
     (classes/add prev "disabled")
     (classes/remove prev "disabled"))
@@ -228,12 +243,19 @@
     (classes/add next "disabled")
     (classes/remove next "disabled")))
 
-(defn disable-buttons! [[start-stop-button :as buttons]]
+(defn disable-buttons!
+  "Given a list of buttons disable them all. The
+  first element should be a start/stop button for
+  Example 10."
+  [[start-stop-button :as buttons]]
   (set! (.-innerHTML start-stop-button) "Done")
   (doseq [button buttons]
     (classes/add button "disabled")))
 
-(defn keys-chan []
+(defn keys-chan
+  "Return a channel of :previous and :next events
+  sourced from left and right arrow key presses."
+  []
   (events->chan js/window EventType.KEYDOWN
     (chan 1 (comp (map #(.-keyCode %))
                   (filter #{37 39})
@@ -249,7 +271,7 @@
         next        (events->chan next-button EventType.CLICK
                       (chan 1 (map (constantly :next))))
         max-idx     (dec (count animals))
-        show-card!  (partial show-card! "ex10-card")]
+        set-html!  (partial set-html! "ex10-card")]
     (go
       ;; wait to start
       (<! start-stop)
@@ -259,14 +281,14 @@
         (set! (.-innerHTML start-stop-button) "Stop!")
         (loop [idx 0]
           (style-buttons! idx max-idx prev-button next-button)
-          (show-card! (nth animals idx))
+          (set-html! (nth animals idx))
           ;; wait for next action
           (let [[action c] (alts! [actions start-stop])]
             (if (= c start-stop)
               (do
                 (events/removeAll js/window EventType.KEYDOWN)
                 (disable-buttons! [start-stop-button prev-button next-button])
-                (show-card! ""))
+                (set-html! ""))
               (condp = action
                 :previous (if (pos? idx)
                             (recur (dec idx))
